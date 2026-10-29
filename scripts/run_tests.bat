@@ -3,8 +3,7 @@ echo ==========================================
 echo Running Backend Pytest Suite...
 echo ==========================================
 cd /d "%~dp0..\backend"
-call .venv\Scripts\activate.bat
-pytest -v
+call .venv\Scripts\pytest.exe -v
 if %errorlevel% neq 0 (
     echo [ERROR] Backend tests failed!
     exit /b %errorlevel%

@@ -1,7 +1,7 @@
 # PlacementPilot — Comprehensive Master Implementation Plan (All Pillars)
 
 > **Platform:** PlacementPilot — Placement Preparation & Campus Super-App  
-> **Status:** Phase 1 Complete | Phase 2 Database Design & Models COMPLETED & VERIFIED  
+> **Status:** Phase 1 & 2 Complete | Phase 3 Backend Foundation COMPLETED & VERIFIED  
 > **Execution Strategy:** Incremental, verified phases triggered with one-click transitions.
 
 ---
@@ -12,8 +12,8 @@
 |---|---|---|---|---|---|
 | **Phase 1** | **Environment & Setup** | Python 3.12 venv, Node 20, Vite, React, Tailwind, Alembic, DB verifier, Health endpoint | None | **COMPLETED & VERIFIED** | `scripts/run_tests.bat` |
 | **Phase 2** | **Unified Database Design** | SQLAlchemy 2.0 models for all 25 tables, Alembic migration `001`, development seed script | Phase 1 | **COMPLETED & VERIFIED** | `scripts/run_tests.bat` |
-| **Phase 3** | **Backend Foundation** | Versioned API routing, error middleware, pagination, response envelopes | Phase 2 | **QUEUED** | Phase 3 Trigger |
-| **Phase 4** | **Auth & Campus Scoping** | Argon2id hashing, JWT claims with `campus_name`, RBAC (student/admin/staff) | Phase 2, 3 | **QUEUED** | Phase 4 Trigger |
+| **Phase 3** | **Backend Foundation** | Standardized response envelopes, centralized exception handlers, pagination, repositories | Phase 2 | **COMPLETED & VERIFIED** | `scripts/run_tests.bat` |
+| **Phase 4** | **Auth & Campus Scoping** | Argon2id hashing, JWT claims with `campus_name`, RBAC (student/admin/staff) | Phase 2, 3 | **READY TO START** | Phase 4 Trigger |
 | **Phase 5** | **Frontend Design System** | Modern educational SaaS shell, responsive sidebar, campus theme, modals | Phase 1 | **QUEUED** | Phase 5 Trigger |
 | **Phase 6** | **Student Profile & Onboarding** | Degree, branch, graduation year, CGPA, skills, target roles, campus & hostel block | Phase 4, 5 | **QUEUED** | Phase 6 Trigger |
 | **Phase 7** | **Readiness Assessment Engine** | 6 subjects, question bank, timed attempts, server-side scoring | Phase 2, 4 | **QUEUED** | Phase 7 Trigger |
@@ -60,19 +60,21 @@
   12. `app/models/__init__.py`: Aggregates and exports all 25 entities.
 - **Alembic Migration:**
   - `alembic/versions/001_initial_unified_schema.py`: Explicit, pristine migration with tables, primary keys, foreign key constraints with `ON DELETE CASCADE`, unique constraints, and B-tree indexes.
-  - `alembic/env.py`: Configured to discover all models automatically via `Base.metadata`.
 - **Development Seed Script:**
-  - `scripts/seed_dev_data.py`: Seeds realistic, clearly labeled sample data (3 users with Argon2id passwords, questions for 6 subjects with step-by-step explanations, diagnostic assessment, study plan, resume analysis, mock interview, note with flashcards, 3 categorized opportunities, 2 marketplace items, 1 club, 1 teammate request, 1 showcase post, and 1 facility maintenance ticket).
-- **Test Suite (`backend/tests/test_models.py`):**
-  - `test_metadata_table_registration`: PASSED (all 25 tables confirmed in metadata).
-  - `test_user_and_profile_crud_and_cascade`: PASSED (relationship and cascade deletion verified).
-  - `test_assessment_attempt_and_scoring`: PASSED (scoring and answer audit verified).
-  - `test_study_plan_task_progression`: PASSED (task completion lifecycle verified).
-  - `test_opportunity_and_tracking_pipeline`: PASSED (pipeline status and constraints verified).
-  - `test_ai_study_assistant_workflow`: PASSED (deck and flashcards cascade verified).
-  - `test_marketplace_campus_scoping`: PASSED (campus boundary and pricing verified).
-  - `test_campus_community_and_hostel_services`: PASSED (clubs, posts, and tickets verified).
+  - `scripts/seed_dev_data.py`: Seeds realistic sample data across all 6 placement subjects and campus pillars.
+
+### Phase 3: Backend Foundation & API Architecture (COMPLETED & VERIFIED)
+- **Objective:** Establish production-grade error handling, response envelopes, pagination utilities, request tracing, and generic repository/service patterns.
+- **Components Built:**
+  1. `app/schemas/common.py`: Standardized envelopes `ResponseEnvelope[T]`, `ErrorDetail`, `ErrorEnvelope`, `PaginationParams` (page, page_size, sort_by, order, offset), and `PaginatedResponse[T]` (items, total, total_pages, has_next, has_prev).
+  2. `app/core/exceptions.py`: Comprehensive domain exception hierarchy (`AppException`, `EntityNotFoundException`, `BadRequestException`, `UnauthorizedException`, `ForbiddenException`, `ConflictException`, `ValidationException`, `RateLimitException`, `DatabaseException`).
+  3. `app/core/error_handlers.py`: Centralized exception handlers for FastAPI catching `AppException`, Pydantic `RequestValidationError`, `StarletteHTTPException`, `SQLAlchemyError`, and uncaught server errors without leaking credentials.
+  4. `app/middleware/request_context.py`: `RequestIDAndTimingMiddleware` attaching unique `X-Request-ID` and `X-Process-Time-Ms` headers and logging request latency.
+  5. `app/repositories/base.py`: Type-safe generic `BaseRepository[ModelType, CreateSchemaType, UpdateSchemaType]` providing standardized CRUD and pagination operations (`get`, `get_or_404`, `get_multi`, `create`, `update`, `delete`, `count`).
+  6. `app/services/base.py`: Generic `BaseService` encapsulating business rules and orchestrating repository queries.
+  7. `app/api/v1/routes/system.py`: Foundation demonstration endpoints for query validation, custom exception triggering, and pagination navigation.
+  8. `backend/tests/test_foundation.py`: 7 comprehensive tests verifying response envelopes, validation error details, domain exception catching, pagination navigation math, telemetry headers, and repository/service CRUD operations.
 - **Test Summary:**
-  - Pytest: **11/11 passed** in 0.34s.
-  - Vitest: **2/2 passed** in 57ms.
+  - Pytest: **18/18 passed** in 0.47s.
+  - Vitest: **2/2 passed** in 200ms.
   - Combined `scripts/run_tests.bat`: **PASSED with exit code 0**.

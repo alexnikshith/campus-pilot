@@ -2,7 +2,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import logging
+
 from app.core.config import settings
+from app.core.error_handlers import register_error_handlers
+from app.middleware.request_context import RequestIDAndTimingMiddleware
 from app.api.v1.router import api_v1_router
 
 logging.basicConfig(
@@ -26,7 +29,10 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# CORS Middleware configuration
+# 1. Telemetry & Request ID Middleware
+app.add_middleware(RequestIDAndTimingMiddleware)
+
+# 2. CORS Middleware configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
@@ -35,7 +41,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include versioned API router
+# 3. Register Centralized Exception Handlers
+register_error_handlers(app)
+
+# 4. Include versioned API router
 app.include_router(api_v1_router, prefix=settings.API_V1_PREFIX)
 
 @app.get("/")
