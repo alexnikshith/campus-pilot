@@ -17,6 +17,10 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440  # 24 hours
     ALGORITHM: str = "HS256"
     
+    # Rate Limiting (Brute-force protection on auth endpoints)
+    RATE_LIMIT_LOGIN_ATTEMPTS: int = 5
+    RATE_LIMIT_WINDOW_SECONDS: int = 300  # 5 minutes lockout window
+    
     # CORS
     FRONTEND_ORIGIN: str = "http://localhost:5173"
     

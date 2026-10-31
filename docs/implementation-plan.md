@@ -1,7 +1,7 @@
 # PlacementPilot — Comprehensive Master Implementation Plan (All Pillars)
 
 > **Platform:** PlacementPilot — Placement Preparation & Campus Super-App  
-> **Status:** Phase 1 & 2 Complete | Phase 3 Backend Foundation COMPLETED & VERIFIED  
+> **Status:** Phases 1, 2, 3 & 4 COMPLETED & VERIFIED | 34 Pytest + 2 Vitest Passing  
 > **Execution Strategy:** Incremental, verified phases triggered with one-click transitions.
 
 ---
@@ -13,7 +13,7 @@
 | **Phase 1** | **Environment & Setup** | Python 3.12 venv, Node 20, Vite, React, Tailwind, Alembic, DB verifier, Health endpoint | None | **COMPLETED & VERIFIED** | `scripts/run_tests.bat` |
 | **Phase 2** | **Unified Database Design** | SQLAlchemy 2.0 models for all 25 tables, Alembic migration `001`, development seed script | Phase 1 | **COMPLETED & VERIFIED** | `scripts/run_tests.bat` |
 | **Phase 3** | **Backend Foundation** | Standardized response envelopes, centralized exception handlers, pagination, repositories | Phase 2 | **COMPLETED & VERIFIED** | `scripts/run_tests.bat` |
-| **Phase 4** | **Auth & Campus Scoping** | Argon2id hashing, JWT claims with `campus_name`, RBAC (student/admin/staff) | Phase 2, 3 | **READY TO START** | Phase 4 Trigger |
+| **Phase 4** | **Auth & Campus Scoping** | Argon2id hashing, JWT claims with `campus_name`, RBAC (student/admin/staff), rate limiting, bounds | Phase 2, 3 | **COMPLETED & VERIFIED** | `scripts/run_tests.bat` |
 | **Phase 5** | **Frontend Design System** | Modern educational SaaS shell, responsive sidebar, campus theme, modals | Phase 1 | **QUEUED** | Phase 5 Trigger |
 | **Phase 6** | **Student Profile & Onboarding** | Degree, branch, graduation year, CGPA, skills, target roles, campus & hostel block | Phase 4, 5 | **QUEUED** | Phase 6 Trigger |
 | **Phase 7** | **Readiness Assessment Engine** | 6 subjects, question bank, timed attempts, server-side scoring | Phase 2, 4 | **QUEUED** | Phase 7 Trigger |
@@ -78,3 +78,44 @@
   - Pytest: **18/18 passed** in 0.47s.
   - Vitest: **2/2 passed** in 200ms.
   - Combined `scripts/run_tests.bat`: **PASSED with exit code 0**.
+
+### Phase 4: Authentication & Authorization (COMPLETED & VERIFIED)
+- **Objective:** Build enterprise-grade security infrastructure with modern Argon2id password hashing, JWT authentication enriched with campus scoping and role claims, granular RBAC dependencies, IP-aware sliding-window rate limiting on sensitive auth endpoints, and student resource ownership boundary enforcement.
+- **Components Built:**
+  1. `app/core/security.py`:
+     - **Argon2id Hashing:** Password hashing configured with RFC 9106 Argon2id parameters via `passlib.hash.argon2.using(type="ID")`. Zero MD5/SHA1/plain bcrypt legacy.
+     - **Password Strength Rules:** Strict validation enforcing minimum 8 characters, uppercase, lowercase, numbers, and special symbols.
+     - **JWT Tokens:** HS256 JWT encoding and decoding carrying `sub` (User ID), `role`, `campus_name`, `email`, `iat`, and `exp` claims.
+  2. `app/core/rate_limiter.py`:
+     - Thread-safe sliding-window in-memory rate limiter `InMemoryRateLimiter` with automatic expiration cleanup.
+     - Applied to `/login` endpoint (5 attempts per 5-minute sliding window per client IP) returning HTTP 429 `RateLimitException` with `Retry-After` header.
+  3. `app/schemas/auth.py`:
+     - Strongly typed Pydantic V2 schemas: `UserRegisterRequest`, `UserLoginRequest`, `UserResponse`, `StudentProfileBrief`, `CurrentUserResponse`, `TokenResponse`, `UserUpdateRequest`, `PasswordChangeRequest`.
+     - Zero credential leakage: `hashed_password` is never included in any API response model.
+  4. `app/repositories/user.py`:
+     - `UserRepository` extending `BaseRepository[User, UserRegisterRequest, UserUpdateRequest]`.
+     - Atomic creation of `User` and connected `StudentProfile` with department, academic year, campus, and default CGPA.
+     - Case-insensitive email indexing and lookup methods (`get_by_email`).
+  5. `app/services/auth_service.py`:
+     - Domain logic orchestration: prevents self-assignment of `admin` role during public registration, verifies active account status, verifies current password prior to rotation, and generates signed tokens.
+  6. `app/api/deps.py`:
+     - `get_current_user`: OAuth2 Bearer token extractor, decoder, and user retrieval dependency.
+     - `get_current_active_user`: Enforces user active status.
+     - `require_role(*allowed_roles)`: Factory dependency producing reusable RBAC guards (e.g. `require_role(UserRole.ADMIN)`).
+     - `verify_resource_ownership(resource_user_id, current_user)`: Guarantees students can only read/write their own data while allowing staff/admin oversight.
+     - `get_client_ip`: Client IP extractor honoring reverse proxy forwarding headers (`X-Forwarded-For`).
+  7. `app/api/v1/routes/auth.py`:
+     - `POST /api/v1/auth/register`: Public student registration with Argon2id hashing.
+     - `POST /api/v1/auth/login`: IP rate-limited authentication returning scoped JWT bearer token.
+     - `POST /api/v1/auth/logout`: RFC-compliant stateless logout response with cache-clearing instructions.
+     - `GET /api/v1/auth/me`: Authenticated profile retrieval with student academic metadata.
+     - `PUT /api/v1/auth/me`: Profile updates (full name, phone number, bio, avatar URL).
+     - `POST /api/v1/auth/change-password`: Secure password rotation verifying old credentials and password complexity.
+     - `GET /api/v1/auth/admin-check`: Protected RBAC route restricted strictly to admins.
+     - `GET /api/v1/auth/student-private-data/{user_id}`: Protected ownership-guarded route.
+  8. `backend/tests/test_auth.py`:
+     - 16 comprehensive integration test cases covering successful registration, duplicate email rejection, weak password rejection, admin privilege self-assignment prevention, login success, invalid credentials rejection, inactive user block, profile retrieval & updates, token tampering/expiration, password rotation verification, RBAC role guard enforcement, student ownership boundary enforcement, and sliding-window rate limit triggers.
+- **Test Summary:**
+  - Pytest Backend: **34/34 passed** (100% pass rate in 8.35s).
+  - Vitest Frontend: **2/2 passed** (100% pass rate).
+  - Frontend Build: **TypeScript + Vite bundled in 6.08s with 0 errors**.

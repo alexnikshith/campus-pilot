@@ -21,11 +21,16 @@ All JSON responses follow the standardized envelope:
 
 ## 2. API Endpoints Catalog by Module
 
-### 2.1 System & Core Auth
+### 2.1 System & Core Auth (`/api/v1/auth`)
 - `GET /api/v1/health` — System status and sanitized database connectivity.
-- `POST /api/v1/auth/register` — Register student/staff with campus affiliation.
-- `POST /api/v1/auth/login` — Authenticate and receive JWT with campus claims.
-- `GET /api/v1/auth/me` — Current authenticated user details.
+- `POST /api/v1/auth/register` — Register student with Argon2id password hashing and auto-initialized profile.
+- `POST /api/v1/auth/login` — Authenticate and receive JWT with campus & role claims (IP rate-limited to 5 attempts / 5-min sliding window).
+- `POST /api/v1/auth/logout` — RFC-compliant stateless logout response.
+- `GET /api/v1/auth/me` — Current authenticated user profile with academic metadata.
+- `PUT /api/v1/auth/me` — Update user profile details (full name, phone, bio, avatar).
+- `POST /api/v1/auth/change-password` — Secure password rotation verifying old credentials and enforcing complexity.
+- `GET /api/v1/auth/admin-check` — Administrator-only RBAC protected verification route.
+- `GET /api/v1/auth/student-private-data/{user_id}` — Resource ownership protected route (only the owner or admin/staff).
 
 ### 2.2 Student Profile (`/api/v1/profile`)
 - `GET /api/v1/profile` — Academic profile, target roles, skills, and hostel room.

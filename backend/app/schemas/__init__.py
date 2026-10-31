@@ -9,12 +9,29 @@ from app.schemas.common import (
     PaginationParams,
     PaginatedResponse
 )
+from app.schemas.auth import (
+    UserRegisterRequest,
+    UserLoginRequest,
+    UserResponse,
+    StudentProfileBrief,
+    CurrentUserResponse,
+    TokenResponse,
+    UserUpdateRequest,
+    PasswordChangeRequest
+)
 
 __all__ = [
     "ResponseEnvelope",
     "ErrorDetail",
     "ErrorEnvelope",
     "PaginationParams",
-    "PaginatedResponse"
+    "PaginatedResponse",
+    "UserRegisterRequest",
+    "UserLoginRequest",
+    "UserResponse",
+    "StudentProfileBrief",
+    "CurrentUserResponse",
+    "TokenResponse",
+    "UserUpdateRequest",
+    "PasswordChangeRequest"
 ]
-
