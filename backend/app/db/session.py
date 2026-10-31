@@ -15,11 +15,11 @@ engine_args = {
     "pool_pre_ping": True,
 }
 
-if settings.DATABASE_URL.startswith("postgresql"):
+if settings.sync_database_url.startswith("postgresql"):
     engine_args["pool_size"] = settings.DATABASE_POOL_SIZE
     engine_args["max_overflow"] = settings.DATABASE_MAX_OVERFLOW
 
-engine = create_engine(settings.DATABASE_URL, **engine_args)
+engine = create_engine(settings.sync_database_url, **engine_args)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

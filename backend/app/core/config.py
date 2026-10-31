@@ -41,6 +41,18 @@ class Settings(BaseSettings):
     DATABASE_POOL_SIZE: int = 10
     DATABASE_MAX_OVERFLOW: int = 20
 
+    @property
+    def sync_database_url(self) -> str:
+        """
+        Normalizes DATABASE_URL for SQLAlchemy 2.0.
+        Cloud hosts (Neon, Supabase, Vercel Postgres, AWS) often provide 'postgres://'.
+        SQLAlchemy requires 'postgresql://'.
+        """
+        url = self.DATABASE_URL.strip()
+        if url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql://", 1)
+        return url
+
     # Storage
     STORAGE_DIR: str = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "..", "storage")
     MAX_UPLOAD_SIZE_BYTES: int = 5 * 1024 * 1024  # 5 MB

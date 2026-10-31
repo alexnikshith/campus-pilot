@@ -38,6 +38,7 @@ pnpm-debug.log*
 lerna-debug.log*
 frontend/dist/
 frontend/dist-ssr/
+*.tsbuildinfo
 *.local
 
 # Environment variables & secrets
@@ -65,3 +66,6 @@ backend/storage/temp/*
 
 # Docker volumes
 pgdata/
+
+# Vercel
+.vercel/

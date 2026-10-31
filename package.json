@@ -1,0 +1,12 @@
+{
+  "name": "placementpilot-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PlacementPilot & Campus Super-App Monorepo",
+  "scripts": {
+    "build": "npm --prefix frontend run build",
+    "test": "npm --prefix frontend run test",
+    "lint": "npm --prefix frontend run lint"
+  }
+}
+
