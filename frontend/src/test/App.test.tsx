@@ -1,19 +1,36 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import App from '../App';
 
-describe('PlacementPilot Frontend Setup', () => {
-  it('renders the application brand and hero header', () => {
+describe('PlacementPilot Shell & Authentication Flow', () => {
+  it('mounts the app and redirects unauthenticated users to the LoginPage', async () => {
     render(<App />);
-    const placementElements = screen.getAllByText(/Placement/i);
-    expect(placementElements.length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText(/Phase 1 Initialized/i)).toBeInTheDocument();
+    // Brand header check
+    const brandTitles = await screen.findAllByText(/Placement/i);
+    expect(brandTitles.length).toBeGreaterThanOrEqual(1);
+
+    // Login page prompt checks
+    expect(screen.getByText(/Sign in to your campus placement preparation/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/College Email/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^Password$/i)).toBeInTheDocument();
   });
 
-  it('renders Phase 1 verification modules', () => {
+  it('allows quick demo credential auto-fill for student and admin', async () => {
     render(<App />);
-    expect(screen.getByText(/Frontend Stack Verified/i)).toBeInTheDocument();
-    expect(screen.getByText(/Backend Environment/i)).toBeInTheDocument();
-    expect(screen.getByText(/Modular Architecture/i)).toBeInTheDocument();
+
+    const studentDemoBtn = await screen.findByRole('button', { name: /Student Demo/i });
+    expect(studentDemoBtn).toBeInTheDocument();
+
+    fireEvent.click(studentDemoBtn);
+
+    const emailInput = screen.getByLabelText(/College Email/i) as HTMLInputElement;
+    expect(emailInput.value).toBe('student@apex.edu');
+  });
+
+  it('renders link to create new student account', async () => {
+    render(<App />);
+    const registerLink = await screen.findByRole('link', { name: /create an account/i });
+    expect(registerLink).toBeInTheDocument();
+    expect(registerLink).toHaveAttribute('href', '/register');
   });
 });
