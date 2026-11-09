@@ -118,3 +118,4 @@ export interface AssessmentOverviewStats {
   best_subject: string | null;
   focus_area: string | null;
 }
+

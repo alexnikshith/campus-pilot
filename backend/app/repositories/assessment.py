@@ -188,3 +188,4 @@ class AssessmentRepository(BaseRepository[Assessment, Any, Any]):
 
 
 assessment_repository = AssessmentRepository()
+
