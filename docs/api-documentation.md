@@ -40,11 +40,14 @@ All JSON responses follow the standardized envelope:
 - `POST /api/v1/profile/onboarding` — Multi-step onboarding wizard atomic submission.
 - `GET /api/v1/profile/{user_id}` — Student profile lookup (restricted to owner student, campus staff, or administrator).
 
-### 2.3 Placement Preparation Engine
-- `GET /api/v1/assessments` — List diagnostic assessments across 6 core subjects.
-- `POST /api/v1/assessments/{id}/start` — Begin timed attempt.
-- `POST /api/v1/assessments/attempts/{id}/submit` — Submit answers for server-side score calculation.
-- `GET /api/v1/assessments/attempts/{id}/results` — Detailed subject and topic score report.
+### 2.3 Placement Preparation Engine — Assessments (`/api/v1/assessments`)
+- `GET /api/v1/assessments` — List active assessments with question count, duration, pass threshold, and subject tags.
+- `GET /api/v1/assessments/stats` — User overview metrics (total attempts, average score %, best subject, focus area).
+- `GET /api/v1/assessments/history` — List authenticated student's past attempts and scores in reverse chronological order.
+- `GET /api/v1/assessments/{id}` — Assessment detail with question sequence (answers and explanations strictly masked).
+- `POST /api/v1/assessments/{id}/start` — Start or resume timed attempt session (returns expires_at and masked questions).
+- `POST /api/v1/assessments/attempts/{attempt_id}/submit` — Submit answers for server-side evaluation, 6-subject breakdown, and diagnostic gap analysis.
+- `GET /api/v1/assessments/attempts/{attempt_id}/results` — Detailed scorecard, subject proficiency breakdown, and question-by-question review with technical explanations.
 - `POST /api/v1/study-plans/generate` — Generate deterministic study plan from assessment weaknesses.
 - `GET /api/v1/study-plans/active` — Active plan with daily task checklist.
 - `PATCH /api/v1/study-plans/tasks/{id}/toggle` — Mark task complete/reopen.

@@ -83,3 +83,4 @@ export interface NavGroup {
 }
 
 export * from './profile';
+export * from './assessment';

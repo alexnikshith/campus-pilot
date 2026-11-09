@@ -186,3 +186,44 @@
   - Pytest Backend Suite: **44/44 passed** (100% pass rate in 5.78s).
   - Vitest Frontend Suite: **21/21 passed** (100% pass rate in 4.00s).
   - Production Bundle: **TypeScript compiled + Vite production build passed in 7.51s with 0 errors**.
+
+### Phase 7: Readiness Assessment Engine (COMPLETED & VERIFIED)
+- **Objective:** Deliver an engineering placement readiness assessment engine covering 6 foundational subjects (Programming Fundamentals, Data Structures & Algorithms, DBMS, Operating Systems, Computer Networks, and Aptitude), cheat-proof active testing with masked answers and explanations, server-side timed sessions with duration enforcement and auto-submission, deterministic server-side grading, granular per-subject diagnostic breakdown (`proficient`, `competent`, `needs_focus`), strategic weakness gap analysis feeding Phase 8 study planning, full question review post-submission, and historical scorecard tracking.
+- **Components Built:**
+  1. `backend/app/schemas/assessment.py`:
+     - Pydantic v2 models: `QuestionPublicResponse` (strictly masks `correct_option` and `explanation`), `QuestionReviewResponse` (exposes full technical explanation and marks breakdown post-submission), `AssessmentSummaryResponse`, `AssessmentDetailResponse`, `StartAttemptResponse`, `AnswerSubmission`, `SubmitAttemptRequest`, `SubjectScoreDetail`, `AttemptResultResponse`, `AttemptHistoryItem`, and `AssessmentOverviewStats`.
+  2. `backend/app/repositories/assessment.py`:
+     - `AssessmentRepository` extending `BaseRepository`: eager-loaded query methods for active assessments, questions, active attempt detection/resumption, attempt creation, answer persistence, user attempt history, and aggregated placement stats across attempts.
+  3. `backend/app/services/assessment_service.py`:
+     - `AssessmentService`: assessment catalog retrieval with subject aggregation, test-session initiation with expiration validation, server-side grading comparing student choices against correct options, exact marks computation, 6-subject readiness percentage calculation with proficiency status, automated weakness extraction, and diagnostic study recommendations.
+  4. `backend/app/api/v1/routes/assessment.py`:
+     - `GET /api/v1/assessments`: Catalog of active assessments with question count and subject tags.
+     - `GET /api/v1/assessments/stats`: Aggregated overview stats (total attempts, average score %, strongest subject, focus area).
+     - `GET /api/v1/assessments/history`: Reverse-chronological list of student attempts.
+     - `GET /api/v1/assessments/{id}`: Detailed assessment structure with questions masked.
+     - `POST /api/v1/assessments/{id}/start`: Start or resume timed attempt.
+     - `POST /api/v1/assessments/attempts/{attempt_id}/submit`: Submit answers for server-side evaluation.
+     - `GET /api/v1/assessments/attempts/{attempt_id}/results`: Full scorecard with diagnostic breakdown and question review.
+  5. `backend/tests/test_assessment.py`:
+     - 8 comprehensive tests verifying catalog retrieval, question masking during test-taking, active attempt resumption, perfect score evaluation (100% and proficient tags), partial/unanswered scoring with weakness diagnosis, duplicate submission prevention, student privacy & campus staff access authorization, and attempt history / stats calculation.
+  6. `backend/scripts/seed_dev_data.py`:
+     - Expanded question bank covering all 6 placement subjects (DSA, Programming Fundamentals, DBMS, OS, Networks, Aptitude) and 3 seeded assessments (`Diagnostic Baseline`, `DSA Rapid Mastery Mock`, `Systems & Database Deep-Dive`).
+  7. `frontend/src/types/assessment.ts`:
+     - Complete TypeScript interfaces for questions, attempts, scorecards, diagnostic details, and overview metrics.
+  8. `frontend/src/services/assessmentService.ts`:
+     - API client methods for all assessment operations.
+  9. `frontend/src/components/assessment/AssessmentCard.tsx`:
+     - Visual card with assessment type badge, duration, question count, passing percentage, subject chips, and start action.
+  10. `frontend/src/components/assessment/AssessmentExamModal.tsx`:
+      - Live countdown timer with color-coded alerts (< 5m amber, < 1m rose), question palette matrix (answered, flagged, current, unanswered), question navigation, clear option, review flags, and submission confirmation dialog with auto-submit on expiration.
+  11. `frontend/src/components/assessment/AssessmentResultModal.tsx`:
+      - High-craft scorecard: pass/fail banner, readiness percentage, 6-subject diagnostic breakdown with progress bars, identified strengths and recommended action items, and filterable question-by-question review with technical explanations.
+  12. `frontend/src/pages/AssessmentsPage.tsx`:
+      - Placement readiness hub with overview metrics, catalog filtering (Diagnostic vs Subject Mocks), keyword search, interactive exam modal, detailed scorecard modal, and attempt history table.
+  13. `frontend/src/test/Assessment.test.tsx`:
+      - 5 Vitest tests covering AssessmentCard, AssessmentExamModal (masking, option selection, submission), AssessmentResultModal (scorecard, subject breakdown, explanation expansion), and AssessmentsPage (catalog, metrics, history switching).
+- **Test Summary:**
+  - Pytest Backend Suite: **52/52 passed** (100% pass rate in 43.52s).
+  - Vitest Frontend Suite: **26/26 passed** (100% pass rate in 13.12s).
+  - Production Bundle: **TypeScript compiled + Vite production build passed in 18.01s with 0 errors**.
+

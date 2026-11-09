@@ -181,6 +181,96 @@ def seed_database():
                 ],
                 "correct_option": "B",
                 "explanation": "Rate of A = 1/12 per day. Rate of B = 1/24 per day. Combined rate = 1/12 + 1/24 = 3/24 = 1/8. Total time = 8 days."
+            },
+            # 7. DSA (LRU Cache)
+            {
+                "subject": "Data Structures & Algorithms",
+                "topic": "Hash Maps & Linked Lists",
+                "difficulty": "hard",
+                "question_text": "Which combination of data structures provides O(1) average time complexity for both get and put operations in an LRU (Least Recently Used) cache?",
+                "options": [
+                    {"id": "A", "text": "Array and Binary Heap"},
+                    {"id": "B", "text": "Hash Map and Doubly Linked List"},
+                    {"id": "C", "text": "Singly Linked List and Stack"},
+                    {"id": "D", "text": "Red-Black Tree and Queue"}
+                ],
+                "correct_option": "B",
+                "explanation": "A Doubly Linked List allows O(1) insertion and removal of nodes from both head and tail, while a Hash Map maps keys directly to linked list nodes for O(1) lookups."
+            },
+            # 8. Programming Fundamentals (OOP & Memory)
+            {
+                "subject": "Programming Fundamentals",
+                "topic": "Object Copies & Mutability",
+                "difficulty": "medium",
+                "question_text": "What distinguishes a deep copy from a shallow copy when duplicating nested compound objects?",
+                "options": [
+                    {"id": "A", "text": "Shallow copy duplicates objects recursively, whereas deep copy only copies references"},
+                    {"id": "B", "text": "Deep copy constructs a new compound object and recursively inserts copies of child objects found in the original"},
+                    {"id": "C", "text": "There is no functional difference; they are synonymous across high-level languages"},
+                    {"id": "D", "text": "Shallow copies are immutable, whereas deep copies are mutable"}
+                ],
+                "correct_option": "B",
+                "explanation": "A deep copy constructs a new compound object and recursively duplicates every nested child object, preventing modifications to child elements from reflecting in the original."
+            },
+            # 9. DBMS (Transactions & ACID)
+            {
+                "subject": "DBMS",
+                "topic": "Transaction Isolation Levels",
+                "difficulty": "hard",
+                "question_text": "Which standard SQL transaction isolation level prevents Dirty Reads and Non-Repeatable Reads, but may still permit Phantom Reads under ANSI/ISO SQL standards?",
+                "options": [
+                    {"id": "A", "text": "Read Uncommitted"},
+                    {"id": "B", "text": "Read Committed"},
+                    {"id": "C", "text": "Repeatable Read"},
+                    {"id": "D", "text": "Serializable"}
+                ],
+                "correct_option": "C",
+                "explanation": "Repeatable Read guarantees that any data read cannot change throughout the transaction (preventing non-repeatable reads), but newly inserted rows by concurrent transactions matching a query predicate can still cause phantom reads."
+            },
+            # 10. Operating Systems (Virtual Memory)
+            {
+                "subject": "Operating Systems",
+                "topic": "Paging & Memory Management",
+                "difficulty": "medium",
+                "question_text": "Why do modern operating systems employ Multi-Level Paging instead of a single contiguous page table for 64-bit systems?",
+                "options": [
+                    {"id": "A", "text": "To eliminate the need for Translation Lookaside Buffers (TLBs)"},
+                    {"id": "B", "text": "To prevent internal fragmentation entirely"},
+                    {"id": "C", "text": "To avoid allocating memory for unused portions of the virtual address space"},
+                    {"id": "D", "text": "To increase memory access speed during page faults"}
+                ],
+                "correct_option": "C",
+                "explanation": "A single page table for a 64-bit address space would require petabytes of storage. Multi-level paging allows second and third-level page tables to be allocated only when needed for allocated memory regions."
+            },
+            # 11. Computer Networks (Transport Protocols)
+            {
+                "subject": "Computer Networks",
+                "topic": "Transport Layer Protocols",
+                "difficulty": "easy",
+                "question_text": "Which transport protocol guarantees in-order byte-stream delivery with end-to-end flow control and congestion avoidance?",
+                "options": [
+                    {"id": "A", "text": "User Datagram Protocol (UDP)"},
+                    {"id": "B", "text": "Transmission Control Protocol (TCP)"},
+                    {"id": "C", "text": "Internet Control Message Protocol (ICMP)"},
+                    {"id": "D", "text": "Address Resolution Protocol (ARP)"}
+                ],
+                "correct_option": "B",
+                "explanation": "TCP provides reliable, sequenced, in-order packet delivery using acknowledgments, sequence numbers, sliding windows for flow control, and AIMD congestion control algorithms."
+            },
+            # 12. Aptitude (Quantitative Speed & Distance)
+            {
+                "subject": "Aptitude",
+                "topic": "Speed, Time & Distance",
+                "difficulty": "medium",
+                "question_text": "A train running at 54 km/hr takes 20 seconds to completely cross a platform of length 180 meters. What is the length of the train?",
+                "options": [
+                    {"id": "A", "text": "100 meters"},
+                    {"id": "B", "text": "120 meters"},
+                    {"id": "C", "text": "150 meters"},
+                    {"id": "D", "text": "200 meters"}
+                ],
+                "correct_option": "B",
+                "explanation": "Speed = 54 * (5/18) = 15 m/s. Total distance crossed in 20 seconds = 15 * 20 = 300 meters. Total distance = Train Length + Platform Length (180m). Train Length = 300 - 180 = 120 meters."
             }
         ]
 
@@ -203,10 +293,10 @@ def seed_database():
             question_objs.append(q)
         db.flush()
 
-        print("[4/10] Seeding Comprehensive Diagnostic Assessment...")
+        print("[4/10] Seeding Comprehensive Diagnostic and Subject Assessment Catalogs...")
         diag_assessment = models.Assessment(
             title="Comprehensive Technical Placement Readiness Diagnostic (2026)",
-            description="Diagnostic placement evaluation covering DSA, Programming Fundamentals, DBMS, Operating Systems, Networks, and Aptitude.",
+            description="All-in-one placement evaluation covering DSA, Programming Fundamentals, DBMS, Operating Systems, Networks, and Aptitude.",
             assessment_type="diagnostic",
             duration_minutes=45,
             pass_percentage=Decimal("60.00"),
@@ -214,11 +304,56 @@ def seed_database():
             created_at=now
         )
         db.add(diag_assessment)
+
+        dsa_assessment = models.Assessment(
+            title="Data Structures & Algorithms Rapid Mastery Mock",
+            description="Targeted sprint testing Binary Trees, LRU Caches, Memory Management, and Algorithmic Complexity.",
+            assessment_type="subject_mock",
+            duration_minutes=30,
+            pass_percentage=Decimal("70.00"),
+            is_active=True,
+            created_at=now
+        )
+        db.add(dsa_assessment)
+
+        systems_assessment = models.Assessment(
+            title="Core Systems & Database Engineering Assessment",
+            description="Deep dive on DBMS Normalization, Transaction Isolation, OS Deadlocks & Paging, and TCP/IP Protocols.",
+            assessment_type="subject_mock",
+            duration_minutes=35,
+            pass_percentage=Decimal("65.00"),
+            is_active=True,
+            created_at=now
+        )
+        db.add(systems_assessment)
         db.flush()
 
+        # Link questions to diagnostic assessment (all 12 questions)
         for idx, q in enumerate(question_objs):
             aq = models.AssessmentQuestion(
                 assessment_id=diag_assessment.id,
+                question_id=q.id,
+                order_index=idx + 1,
+                marks=1
+            )
+            db.add(aq)
+
+        # Link DSA & Programming questions to dsa_assessment (q0, q1, q6, q7)
+        dsa_questions = [question_objs[0], question_objs[1], question_objs[6], question_objs[7]]
+        for idx, q in enumerate(dsa_questions):
+            aq = models.AssessmentQuestion(
+                assessment_id=dsa_assessment.id,
+                question_id=q.id,
+                order_index=idx + 1,
+                marks=1
+            )
+            db.add(aq)
+
+        # Link Systems questions to systems_assessment (q2, q3, q4, q8, q9, q10)
+        sys_questions = [question_objs[2], question_objs[3], question_objs[4], question_objs[8], question_objs[9], question_objs[10]]
+        for idx, q in enumerate(sys_questions):
+            aq = models.AssessmentQuestion(
+                assessment_id=systems_assessment.id,
                 question_id=q.id,
                 order_index=idx + 1,
                 marks=1
@@ -232,17 +367,17 @@ def seed_database():
             assessment_id=diag_assessment.id,
             started_at=now - timedelta(hours=2),
             submitted_at=now - timedelta(hours=1, minutes=15),
-            total_score=Decimal("5.00"),
-            maximum_score=Decimal("6.00"),
+            total_score=Decimal("10.00"),
+            maximum_score=Decimal("12.00"),
             percentage=Decimal("83.33"),
             status="completed",
             subject_breakdown={
-                "Data Structures & Algorithms": {"score": 1, "max": 1, "percentage": 100},
-                "Programming Fundamentals": {"score": 1, "max": 1, "percentage": 100},
-                "DBMS": {"score": 1, "max": 1, "percentage": 100},
-                "Operating Systems": {"score": 0, "max": 1, "percentage": 0},
-                "Computer Networks": {"score": 1, "max": 1, "percentage": 100},
-                "Aptitude": {"score": 1, "max": 1, "percentage": 100}
+                "Data Structures & Algorithms": {"score": 2, "max": 2, "percentage": 100, "status": "proficient", "topics_needing_work": []},
+                "Programming Fundamentals": {"score": 2, "max": 2, "percentage": 100, "status": "proficient", "topics_needing_work": []},
+                "DBMS": {"score": 2, "max": 2, "percentage": 100, "status": "proficient", "topics_needing_work": []},
+                "Operating Systems": {"score": 0, "max": 2, "percentage": 0, "status": "needs_focus", "topics_needing_work": ["Deadlock & Concurrency", "Paging & Memory Management"]},
+                "Computer Networks": {"score": 2, "max": 2, "percentage": 100, "status": "proficient", "topics_needing_work": []},
+                "Aptitude": {"score": 2, "max": 2, "percentage": 100, "status": "proficient", "topics_needing_work": []}
             }
         )
         db.add(attempt)
