@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Sparkles,
@@ -16,13 +16,26 @@ import {
   Target,
   CheckCircle2,
   Clock,
+  AlertCircle,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, Button, Badge } from '../components/ui';
+import profileService from '../services/profileService';
+import { ProfileCompletenessBreakdown } from '../types';
 
 export const DashboardPage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [completeness, setCompleteness] = useState<ProfileCompletenessBreakdown | null>(null);
+
+  useEffect(() => {
+    profileService
+      .getCompleteness()
+      .then(setCompleteness)
+      .catch(() => {
+        // Silent fail on dashboard if network is offline
+      });
+  }, []);
 
   const placementModules = [
     {
@@ -143,6 +156,33 @@ export const DashboardPage: React.FC = () => {
         {/* Ambient background blur */}
         <div className="absolute right-0 top-0 -mt-12 -mr-12 w-96 h-96 bg-brand-600/15 rounded-full blur-3xl pointer-events-none" />
       </div>
+
+      {/* Profile Completeness Alert (if incomplete) */}
+      {completeness && completeness.total_percentage < 100 && (
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-slate-900 to-amber-500/5 border border-amber-500/20">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+              <AlertCircle className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-xs sm:text-sm font-semibold text-white">
+                Placement Profile is {completeness.total_percentage}% Complete
+              </p>
+              <p className="text-xs text-slate-400">
+                {completeness.next_step_recommendation}
+              </p>
+            </div>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate('/profile')}
+            rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
+          >
+            Complete Profile
+          </Button>
+        </div>
+      )}
 
       {/* 2. Key Metrics Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

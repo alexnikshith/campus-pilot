@@ -1,7 +1,7 @@
 # PlacementPilot — Comprehensive Master Implementation Plan (All Pillars)
 
 > **Platform:** PlacementPilot — Placement Preparation & Campus Super-App  
-> **Status:** Phases 1, 2, 3, 4 & 5 COMPLETED & VERIFIED | 34 Pytest + 14 Vitest Passing  
+> **Status:** Phases 1, 2, 3, 4, 5 & 6 COMPLETED & VERIFIED | 44 Pytest + 21 Vitest Passing  
 > **Execution Strategy:** Incremental, verified phases triggered with one-click transitions.
 
 ---
@@ -15,8 +15,8 @@
 | **Phase 3** | **Backend Foundation** | Standardized response envelopes, centralized exception handlers, pagination, repositories | Phase 2 | **COMPLETED & VERIFIED** | `scripts/run_tests.bat` |
 | **Phase 4** | **Auth & Campus Scoping** | Argon2id hashing, JWT claims with `campus_name`, RBAC (student/admin/staff), rate limiting, bounds | Phase 2, 3 | **COMPLETED & VERIFIED** | `scripts/run_tests.bat` |
 | **Phase 5** | **Frontend Design System** | Modern educational SaaS shell, responsive sidebar, campus theme, modals, toast system | Phase 1, 4 | **COMPLETED & VERIFIED** | `scripts/run_tests.bat` |
-| **Phase 6** | **Student Profile & Onboarding** | Degree, branch, graduation year, CGPA, skills, target roles, campus & hostel block | Phase 4, 5 | **READY TO START** | Phase 6 Trigger |
-| **Phase 7** | **Readiness Assessment Engine** | 6 subjects, question bank, timed attempts, server-side scoring | Phase 2, 4 | **QUEUED** | Phase 7 Trigger |
+| **Phase 6** | **Student Profile & Onboarding** | Degree, branch, graduation year, CGPA, skills, target roles, campus & hostel block | Phase 4, 5 | **COMPLETED & VERIFIED** | `scripts/run_tests.bat` |
+| **Phase 7** | **Readiness Assessment Engine** | 6 subjects, question bank, timed attempts, server-side scoring | Phase 2, 4 | **READY TO START** | Phase 7 Trigger |
 | **Phase 8** | **Deterministic Study Plan** | Rule-based algorithm generating weekly roadmap & daily tasks from diagnostic gaps | Phase 6, 7 | **QUEUED** | Phase 8 Trigger |
 | **Phase 9** | **Placement Dashboard** | Real-time analytics, subject proficiency radar, daily task toggle | Phase 7, 8 | **QUEUED** | Phase 9 Trigger |
 | **Phase 10** | **Coding Practice Module** | Curated DSA problems, in-browser editor, sandboxed test case runner | Phase 3, 5 | **QUEUED** | Phase 10 Trigger |
@@ -154,3 +154,35 @@
   - Vitest Frontend Suite: **14/14 passed** across UI primitives, navigation sidebar, and auth flow.
   - Pytest Backend Suite: **34/34 passed** (100% pass rate).
   - Production Bundle: **TypeScript compiled + Vite production build passed in 7.93s with 0 errors**.
+
+### Phase 6: Student Academic Profile & Onboarding Engine (COMPLETED & VERIFIED)
+- **Objective:** Build an end-to-end academic profile management and onboarding engine supporting degree/branch/CGPA validation, categorized technical skills taxonomy, placement target roles, residency/hostel block details, weighted 5-dimension profile completeness scoring, and an interactive 4-step student onboarding wizard.
+- **Components Built:**
+  1. `backend/app/schemas/profile.py`:
+     - Strongly typed Pydantic models: `TaxonomyResponse`, `ProfileCompletenessBreakdown`, `StudentProfileBase`, `StudentProfileCreate`, `StudentProfileUpdate` (CGPA 0.00-10.00 validation, grad year validation), `OnboardingRequest`, and `StudentProfileResponse`.
+  2. `backend/app/repositories/profile.py`:
+     - `StudentProfileRepository` extending `BaseRepository` with `get_by_user_id` and `upsert_profile` for atomic academic profile updates.
+  3. `backend/app/services/profile_service.py`:
+     - `StudentProfileService`: Curated skills taxonomy across 6 domains, target placement roles, hostel blocks, and locations.
+     - Deterministic 5-dimension weighted completeness scoring: Basic Identity (20%), Academic Info (25%), Target Roles (20%), Technical Skills (20%), and Hostel Residency (15%) with personalized next-step recommendations.
+     - Multi-step onboarding processor (`complete_onboarding`).
+  4. `backend/app/api/v1/routes/profile.py`:
+     - `GET /api/v1/profile`: Full student profile with live completeness score.
+     - `PUT /api/v1/profile`: Update academic credentials, CGPA, target roles, and living preferences.
+     - `GET /api/v1/profile/completeness`: 5-dimension breakdown with action recommendations.
+     - `GET /api/v1/profile/taxonomy`: Curated taxonomy catalog for degrees, branches, skills, and roles.
+     - `POST /api/v1/profile/onboarding`: 1-click atomic multi-step onboarding submission.
+     - `GET /api/v1/profile/{user_id}`: Protected profile retrieval guarded by student resource ownership or admin/staff role.
+  5. `backend/tests/test_profile.py`:
+     - 10 comprehensive tests covering taxonomy catalog retrieval, profile query, update, invalid CGPA rejection, completeness algorithm progression, onboarding submission, skills/roles required validation, privacy boundary enforcement between students, admin lookup, and unauthenticated access blocking.
+  6. `frontend/src/types/profile.ts`: TypeScript definitions for taxonomy, profiles, updates, and onboarding payloads.
+  7. `frontend/src/services/profileService.ts`: Profile API service layer communicating with all backend endpoints.
+  8. `frontend/src/components/profile/ProfileCompletenessBar.tsx`: Visual progress component displaying overall percentage, 5-dimension mini progress bars, recommendation message, and wizard trigger.
+  9. `frontend/src/components/profile/OnboardingWizardModal.tsx`: 4-step wizard modal guiding students through Academics, Target Roles, Skills Inventory (with categories and custom skill input), and Hostel/Location details.
+  10. `frontend/src/pages/ProfilePage.tsx`: Tabbed interface (Academics & CGPA, Placement & Skills, Campus & Hostel, Account & Security) with inline editing, password change modal, and real-time completeness updates.
+  11. `frontend/src/pages/DashboardPage.tsx`: Integrated profile completeness alert banner for quick onboarding access.
+  12. `frontend/src/test/Profile.test.tsx`: 7 Vitest tests validating completeness bar, 5-dimension scores, and onboarding modal steps.
+- **Test Summary:**
+  - Pytest Backend Suite: **44/44 passed** (100% pass rate in 5.78s).
+  - Vitest Frontend Suite: **21/21 passed** (100% pass rate in 4.00s).
+  - Production Bundle: **TypeScript compiled + Vite production build passed in 7.51s with 0 errors**.

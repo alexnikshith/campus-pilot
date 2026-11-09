@@ -32,9 +32,13 @@ All JSON responses follow the standardized envelope:
 - `GET /api/v1/auth/admin-check` — Administrator-only RBAC protected verification route.
 - `GET /api/v1/auth/student-private-data/{user_id}` — Resource ownership protected route (only the owner or admin/staff).
 
-### 2.2 Student Profile (`/api/v1/profile`)
-- `GET /api/v1/profile` — Academic profile, target roles, skills, and hostel room.
-- `PUT /api/v1/profile` — Update academic details and campus preferences.
+### 2.2 Student Profile & Onboarding (`/api/v1/profile`)
+- `GET /api/v1/profile` — Full academic profile, target roles, skills, hostel room, and live 5-dimension completeness score.
+- `PUT /api/v1/profile` — Update academic details, CGPA, target roles, technical skills, and campus preferences.
+- `GET /api/v1/profile/completeness` — 5-dimension completeness breakdown (Basic, Academic, Roles, Skills, Hostel) and action recommendation.
+- `GET /api/v1/profile/taxonomy` — Standardized taxonomy catalogs for degrees, engineering branches, skills by domain, and target roles.
+- `POST /api/v1/profile/onboarding` — Multi-step onboarding wizard atomic submission.
+- `GET /api/v1/profile/{user_id}` — Student profile lookup (restricted to owner student, campus staff, or administrator).
 
 ### 2.3 Placement Preparation Engine
 - `GET /api/v1/assessments` — List diagnostic assessments across 6 core subjects.

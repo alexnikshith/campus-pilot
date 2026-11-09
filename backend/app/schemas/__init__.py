@@ -19,6 +19,16 @@ from app.schemas.auth import (
     UserUpdateRequest,
     PasswordChangeRequest
 )
+from app.schemas.profile import (
+    TaxonomyItem,
+    TaxonomyResponse,
+    ProfileCompletenessBreakdown,
+    StudentProfileBase,
+    StudentProfileCreate,
+    StudentProfileUpdate,
+    OnboardingRequest,
+    StudentProfileResponse,
+)
 
 __all__ = [
     "ResponseEnvelope",
@@ -33,5 +43,13 @@ __all__ = [
     "CurrentUserResponse",
     "TokenResponse",
     "UserUpdateRequest",
-    "PasswordChangeRequest"
+    "PasswordChangeRequest",
+    "TaxonomyItem",
+    "TaxonomyResponse",
+    "ProfileCompletenessBreakdown",
+    "StudentProfileBase",
+    "StudentProfileCreate",
+    "StudentProfileUpdate",
+    "OnboardingRequest",
+    "StudentProfileResponse",
 ]

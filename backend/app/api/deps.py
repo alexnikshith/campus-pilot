@@ -75,9 +75,9 @@ def require_role(allowed_roles: List[str]) -> Callable[[User], User]:
 def verify_resource_ownership(current_user: User, resource_user_id: int) -> bool:
     """
     Enforces privacy boundaries preventing students from accessing or mutating other students' private data.
-    Administrators are granted administrative oversight.
+    Administrators and campus staff are granted institutional oversight.
     """
-    if current_user.role == "admin":
+    if current_user.role in ("admin", "campus_staff"):
         return True
     if current_user.id != resource_user_id:
         raise ForbiddenException(

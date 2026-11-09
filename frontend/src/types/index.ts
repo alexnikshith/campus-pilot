@@ -81,3 +81,5 @@ export interface NavGroup {
   label: string;
   items: NavItem[];
 }
+
+export * from './profile';
